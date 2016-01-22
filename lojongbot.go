@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/ChimeraCoder/anaconda"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -14,15 +14,15 @@ import (
 )
 
 type Configuration struct {
-        Sourcefile                  string
+	Sourcefile                  string
 	Logfile                     string
 	Twitter_access_token        string
 	Twitter_access_token_secret string
 	Twitter_consumer_key        string
 	Twitter_consumer_secret     string
-        Sleep_time_in_seconds int
+	Sleep_time_in_hours         int
+	Sleep_time_margin_in_hours  int
 }
-
 
 var logfile *os.File
 var err error
@@ -62,6 +62,22 @@ func init_bot() {
 
 }
 
+func tweet(tweet_text string) {
+	// twitter api
+	anaconda.SetConsumerKey(configuration.Twitter_consumer_key)
+	anaconda.SetConsumerSecret(configuration.Twitter_consumer_secret)
+	// I don't know about any possible timeout, therefore
+	// initialize new for every tweet
+	api := anaconda.NewTwitterApi(configuration.Twitter_access_token, configuration.Twitter_access_token_secret)
+
+	tweet, err := api.PostTweet("#lojong slogan "+tweet_text, nil)
+	if err != nil {
+		logger.Printf("Problem posting '%s': %s", tweet_text, err)
+	} else {
+		logger.Printf("Tweet with slogan %s posted for user %s", tweet_text, tweet.User.ScreenName)
+	}
+}
+
 // check panics if an error is detected
 func check(e error) {
 	if e != nil {
@@ -82,11 +98,12 @@ func main() {
 	}()
 
 	init_bot()
+	// infinite loop
+	for {
 
-	for i := 0; i < 10; i++ {
-
-		fmt.Printf("%s\n", slogans[rand.Intn(num_slogans)])
-		logger.Printf("Will go to sleep for %d seconds..", configuration.Sleep_time_in_seconds)
-		time.Sleep(time.Duration(configuration.Sleep_time_in_seconds) * time.Second)
+		tweet(slogans[rand.Intn(num_slogans)])
+		sleep_hours := configuration.Sleep_time_in_hours + (configuration.Sleep_time_margin_in_hours - 2*rand.Intn(configuration.Sleep_time_margin_in_hours))
+		logger.Printf("Will go to sleep for %d hours..", sleep_hours)
+		time.Sleep(time.Duration(sleep_hours) * time.Hour)
 	}
 }
