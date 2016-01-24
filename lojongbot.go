@@ -22,6 +22,7 @@ type Configuration struct {
 	Twitter_consumer_secret     string
 	Sleep_time_in_hours         int
 	Sleep_time_margin_in_hours  int
+	Debug                       int
 }
 
 var logfile *os.File
@@ -70,11 +71,15 @@ func tweet(tweet_text string) {
 	// initialize new for every tweet
 	api := anaconda.NewTwitterApi(configuration.Twitter_access_token, configuration.Twitter_access_token_secret)
 
-	tweet, err := api.PostTweet("#lojong slogan "+tweet_text, nil)
-	if err != nil {
-		logger.Printf("Problem posting '%s': %s", tweet_text, err)
+	if configuration.Debug == 1 {
+		logger.Printf("DEBUG-MODE! I am not posting '%s'!", tweet_text)
 	} else {
-		logger.Printf("Tweet with slogan %s posted for user %s", tweet_text, tweet.User.ScreenName)
+		tweet, err := api.PostTweet("#lojong slogan "+tweet_text, nil)
+		if err != nil {
+			logger.Printf("Problem posting '%s': %s", tweet_text, err)
+		} else {
+			logger.Printf("Tweet with slogan %s posted for user %s", tweet_text, tweet.User.ScreenName)
+		}
 	}
 }
 

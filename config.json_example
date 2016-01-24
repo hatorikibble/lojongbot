@@ -6,5 +6,6 @@
  "twitter_consumer_key" : "XXX",
  "twitter_consumer_secret" : "XXX",
  "sleep_time_in_hours" : 24,
- "sleep_time_margin_in_hours", 3
+ "sleep_time_margin_in_hours" : 3,
+ "debug" : 0
 }
