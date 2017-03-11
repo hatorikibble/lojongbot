@@ -32,9 +32,9 @@ var slogans []string
 var num_slogans int
 var configuration Configuration
 
-// init_bot opens a log file, reads the slogans file
+// init opens a log file, reads the slogans file
 // and creates a new random seed
-func init_bot() {
+func init() {
 
 	// config
 	file, _ := os.Open("config.json")
@@ -102,7 +102,6 @@ func main() {
 		os.Exit(1)
 	}()
 
-	init_bot()
 	// infinite loop
 	for {
 
